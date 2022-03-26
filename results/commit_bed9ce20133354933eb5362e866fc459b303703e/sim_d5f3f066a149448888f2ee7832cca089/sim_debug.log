@@ -1,0 +1,23 @@
+2022-03-25T14:38:24.925000Z TestFramework (INFO): Mining blocks for node0 to be able to send enough coins
+2022-03-25T14:38:25.411000Z TestFramework (INFO): Loading test wallet with 0.1 BTC
+2022-03-25T14:38:26.475000Z TestFramework (ERROR): Unexpected exception caught during testing
+Traceback (most recent call last):
+  File "/home/andy/bitcoin/bitcoin/coin-sel-sim-trace/test/functional/test_framework/test_framework.py", line 132, in main
+    self.run_test()
+  File "/home/andy/bitcoin/bitcoin/coin-sel-sim-trace/test/functional/sim_coinselect.py", line 198, in run_test
+    bpf = BPF(text=program, usdt_contexts=[bitcoind_with_usdts])
+  File "/usr/lib/python3.10/site-packages/bcc/__init__.py", line 475, in __init__
+    raise Exception("Failed to compile BPF module %s" % (src_file or "<text>"))
+Exception: Failed to compile BPF module <text>
+2022-03-25T14:38:26.476000Z TestFramework (DEBUG): Closing down network thread
+2022-03-25T14:38:26.526000Z TestFramework (INFO): Stopping nodes
+2022-03-25T14:38:26.527000Z TestFramework.node0 (DEBUG): Stopping node
+2022-03-25T14:38:26.628000Z TestFramework.node0 (DEBUG): Node stopped
+2022-03-25T14:38:26.628000Z TestFramework (WARNING): Not cleaning up dir /tmp/bitcoin_func_test_lt_9dl9s
+2022-03-25T14:38:26.628000Z TestFramework (ERROR): Test failed. Test logging available at /tmp/bitcoin_func_test_lt_9dl9s/test_framework.log
+2022-03-25T14:38:26.629000Z TestFramework (ERROR): 
+2022-03-25T14:38:26.629000Z TestFramework (ERROR): Hint: Call /home/andy/bitcoin/bitcoin/coin-sel-sim-trace/test/functional/combine_logs.py '/tmp/bitcoin_func_test_lt_9dl9s' to consolidate all logs
+2022-03-25T14:38:26.629000Z TestFramework (ERROR): 
+2022-03-25T14:38:26.629000Z TestFramework (ERROR): If this failure happened unexpectedly or intermittently, please file a bug and provide a link or upload of the combined log.
+2022-03-25T14:38:26.629000Z TestFramework (ERROR): https://github.com/bitcoin/bitcoin/issues
+2022-03-25T14:38:26.629000Z TestFramework (ERROR): 

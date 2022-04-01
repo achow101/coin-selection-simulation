@@ -3,13 +3,14 @@
 import argparse
 import os
 
+from collections import defaultdict
 from glob import glob
 
 parser = argparse.ArgumentParser("Collect all results for simulations in a folder into a markdown table")
 parser.add_argument("directory")
 args = parser.parse_args()
 
-results = []
+results = defaultdict(list)
 header = None
 for res_file_path in glob(os.path.join(args.directory, "**/results.txt"), recursive=True):
     print(f"Fetching results from {res_file_path}")
@@ -26,15 +27,21 @@ for res_file_path in glob(os.path.join(args.directory, "**/results.txt"), recurs
             prev_line = line
             if not prev_line:
                 continue
-        results.append(prev_line)
+        scenario = prev_line.split("|")[1].rstrip().lstrip()
+        results[scenario].append(prev_line)
 
 with open(os.path.join(args.directory, "results.md"), "w") as f:
-    f.write(header)
 
-    pipe_count = header.count("|") - 1
-    table_split = "|---" * pipe_count + "|\n"
+    for scenario, res in results.items():
+        f.write(f"{scenario}\n\n")
+        f.write(header)
 
-    f.write(table_split)
+        pipe_count = header.count("|") - 1
+        table_split = "|---" * pipe_count + "|\n"
 
-    for r in results:
-        f.write(r)
+        f.write(table_split)
+
+        for r in res:
+            f.write(r)
+
+        f.write("\n\n\n")

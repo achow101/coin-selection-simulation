@@ -45,3 +45,30 @@ with open(os.path.join(args.directory, "results.md"), "w") as f:
             f.write(r)
 
         f.write("\n\n\n")
+
+
+results = defaultdict(list)
+header = None
+for res_file_path in glob(os.path.join(args.directory, "**/results.csv"), recursive=True):
+    if os.path.join(args.directory, "results.csv") == res_file_path:
+        continue
+    print(f"Fetching results from {res_file_path}")
+    with open(res_file_path, "r") as f:
+        prev_line = None
+        for line in f:
+            if "Scenario File" in line:
+                if header is None:
+                    header = line
+                else:
+                    assert line == header
+            prev_line = line
+            if not prev_line:
+                continue
+        scenario = prev_line.split(",")[0].rstrip().lstrip()
+        results[scenario].append(prev_line)
+
+with open(os.path.join(args.directory, "results.csv"), "w") as f:
+    for scenario, res in results.items():
+        f.write(header)
+        for r in res:
+            f.write(r)

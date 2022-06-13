@@ -2,6 +2,27 @@
 
 This repository contains data and results from running coin selection simulations
 
+## Running Simulations
+
+The simulation script is `scripts/simulation.py`. It is based on a slimmed down version of the Bitcoin Core test framework.
+
+To run, first compile the Bitcoin Core branch you wish to simulate. Then find the `config.ini` file that is usually located in `test/config.ini`.
+
+GitPython will also need to be installed and available to the Python executed by the root user:
+
+    sudo pip install gitpython
+
+A simulation can be run with:
+
+    sudo scripts/simulation.py --scenario <path/to/scenario/file> <path/to/config.ini> results/
+
+Note that the script uses USDT Tracepoints which requires either running the script as root, or setting the requisite privileges for using tracepoints as per [these instructions](https://github.com/bitcoin/bitcoin/pull/24358#issuecomment-1083149220).
+
+The script uses GitPython which executes git itself in order to get some information about the repo.
+However sometimes git does not like it when the repo is owned by a different user than the one that is executing commands on it, so you may need to run the following:
+
+    sudo sudo git config --global --add safe.directory <path/to/repo>
+
 ## Results
 
 Inside the results directory is a directory for the commit hash the simulation was run on.

@@ -23,6 +23,8 @@ However sometimes git does not like it when the repo is owned by a different use
 
     sudo sudo git config --global --add safe.directory <path/to/repo>
 
+Usage:
+
 ```
 usage: simulation.py [options]
 
@@ -45,11 +47,11 @@ options:
                         set a random seed for deterministically reproducing a previous test run
   --timeout-factor TIMEOUT_FACTOR
                         adjust test timeouts by a factor. Setting it to 0 disables all timeouts
-  --scenario SCENARIO
-  --label LABEL
-  --payments PAYMENTS
-  --feerates FEERATES
-  --ops OPS
+  --scenario SCENARIO   Path to scenario file consisting of lines of comma separated pairs of payments and feerates
+  --label LABEL         A label to give to this simulation to help identify its results
+  --payments PAYMENTS   Path to payments file consisting of one payment per line in BTC. Positive is a deposit into the test wallet, negative is a withdrawal from the test wallet.
+  --feerates FEERATES   Path to a feerates file consisting of one feerate per line in BTC/kvb
+  --ops OPS             Maximum number of deposits and withdrawal actions to do, default is all payments in the scenario or payments file
   --weights WEIGHTS [WEIGHTS ...]
                         Causes recipient output types to be chosen randomly with provided weights per address type. Weights must add to 100 and be provided in the following order: bech32m bech32 p2sh-segwit legacy
 ```

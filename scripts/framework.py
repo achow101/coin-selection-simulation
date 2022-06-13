@@ -70,6 +70,7 @@ def check_json_precision():
 
 
 class Simulation:
+    """Copied and modified from BitcoinTestFramework in Bitcoin Core's test/functional/test_framework/test_framework.py"""
     def __init__(self):
         self.chain: str = "regtest"
         self.setup_clean_chain: bool = True
@@ -149,21 +150,23 @@ class Simulation:
             help="adjust test timeouts by a factor. Setting it to 0 disables all timeouts",
         )
 
-        parser.add_argument("--scenario", default=None, action=ScenarioOptionsAction)
-        parser.add_argument("--label", default=None)
+        parser.add_argument("--scenario", default=None, action=ScenarioOptionsAction, help="Path to scenario file consisting of lines of comma separated pairs of payments and feerates")
+        parser.add_argument("--label", default=None, help="A label to give to this simulation to help identify its results")
         parser.add_argument(
             "--payments",
             default=None,
             required="--feerates" in sys.argv,
             action=PaymentsFeeratesOptionsAction,
+            help="Path to payments file consisting of one payment per line in BTC. Positive is a deposit into the test wallet, negative is a withdrawal from the test wallet."
         )
         parser.add_argument(
             "--feerates",
             default=None,
             required="--payments" in sys.argv,
             action=PaymentsFeeratesOptionsAction,
+            help="Path to a feerates file consisting of one feerate per line in BTC/kvb"
         )
-        parser.add_argument("--ops", type=int, default=None)
+        parser.add_argument("--ops", type=int, default=None, help="Maximum number of deposits and withdrawal actions to do, default is all payments in the scenario or payments file")
         parser.add_argument(
             "--weights",
             type=int,

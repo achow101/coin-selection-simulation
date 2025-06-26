@@ -15,6 +15,7 @@ from decimal import Decimal, getcontext
 from framework import Simulation
 from random import random
 from statistics import mean, stdev
+from datetime import datetime
 
 program = """
 #include <uapi/linux/ptrace.h>
@@ -209,7 +210,7 @@ class CoinSelectionSimulation(Simulation):
         # Get Git commit
         repo = git.Repo(self.config["environment"]["SRCDIR"])
         commit = repo.commit("HEAD")
-        commit_hash = commit.hexsha
+        commit_hash = commit.hexsha[:7]
         branch = repo.active_branch.name
         if self.options.label is None:
             self.log.info(f"Based on branch {branch}({commit_hash})")
@@ -218,18 +219,23 @@ class CoinSelectionSimulation(Simulation):
             self.log.info(f"Based on branch: {branch} ({commit_hash}), label: {label}")
 
         # Get a unique id
-        unique_id = uuid.uuid4().hex
+        date = datetime.now().strftime("%Y-%m-%dT%H-%M")
+        unique_id = date + "_" + uuid.uuid4().hex[:8]
         self.log.info(f"This simulation's Unique ID: {unique_id}")
 
         # Make an output folder
         if self.options.label is None:
             results_dir = os.path.join(
-                self.options.resultsdir, f"{branch}-{commit_hash}", f"sim_{unique_id}"
+                self.options.resultsdir,
+                f"{scenario_name}",
+                f"{branch}-{commit_hash}",
+                f"sim_{unique_id}"
             )
         else:
             results_dir = os.path.join(
                 self.options.resultsdir,
-                f"{branch}-{commit_hash}-{label}-",
+                f"{scenario_name}",
+                f"{branch}-{commit_hash}-{label}",
                 f"sim_{unique_id}",
             )
         os.makedirs(results_dir, exist_ok=True)
@@ -341,6 +347,11 @@ class CoinSelectionSimulation(Simulation):
         bpf = BPF(text=program, usdt_contexts=[bitcoind_with_usdts])
 
         self.log.info(f"Simulating using scenario: {self.scenario_name}")
+        if self.options.label is None:
+            self.log.info(f"Based on branch {branch}({commit_hash})")
+        else:
+            label = self.options.label
+            self.log.info(f"Based on branch: {branch} ({commit_hash}), label: {label}")
         self.total_fees = Decimal()
         self.ops = 0
         self.count_sent = 0
@@ -392,7 +403,7 @@ class CoinSelectionSimulation(Simulation):
             sum_csvw.writerow(fields)
 
             res.write(
-                f"----BEGIN SIMULATION RESULTS----\nScenario: {self.scenario_name}\n{header}\n"
+                f"----BEGIN SIMULATION RESULTS----\nScenario: {self.scenario_name}\nBranch: {branch}-{commit_hash}-{label} \n{header}\n"
             )
             res.flush()
             for val_str, fee_str in scenario_data:

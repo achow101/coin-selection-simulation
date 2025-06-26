@@ -223,18 +223,45 @@ class CoinSelectionSimulation(Simulation):
         unique_id = date + "_" + uuid.uuid4().hex[:8]
         self.log.info(f"This simulation's Unique ID: {unique_id}")
 
+        if self.options.scenario:
+            self.scenario_name = os.path.splitext(os.path.basename(self.options.scenario))[0]
+
+            def get_scenario_data(file):
+                for line in file:
+                    val_str, fee_str = line.rstrip().lstrip().split(",")
+                    yield val_str, fee_str
+
+            scenario_files = [open(self.options.scenario, "r")]
+            scenario_data = get_scenario_data(scenario_files[0])
+        elif self.options.payments and self.options.feerates:
+            self.scenario_name = f"{os.path.splitext(os.path.basename(self.options.payments))[0]}_{os.path.splitext(os.path.basename(self.options.feerates))[0]}"
+
+            def cycle(file):
+                while True:
+                    for line in file:
+                        yield line
+                    file.seek(0)
+
+            scenario_files = [
+                open(self.options.payments, "r"),
+                open(self.options.feerates, "r"),
+            ]
+            scenario_data = zip(scenario_files[0], cycle(scenario_files[1]))
+
+        self.scenario_path = self.options.scenario
+
         # Make an output folder
         if self.options.label is None:
             results_dir = os.path.join(
                 self.options.resultsdir,
-                f"{scenario_name}",
+                f"{self.scenario_name}",
                 f"{branch}-{commit_hash}",
                 f"sim_{unique_id}"
             )
         else:
             results_dir = os.path.join(
                 self.options.resultsdir,
-                f"{scenario_name}",
+                f"{self.scenario_name}",
                 f"{branch}-{commit_hash}-{label}",
                 f"sim_{unique_id}",
             )
@@ -276,32 +303,6 @@ class CoinSelectionSimulation(Simulation):
 
         # set this as the default. if weights are provided by the user, we will update this when creating the psbt
         withdraw_address = withdraw_addresses["bech32"]
-        if self.options.scenario:
-            self.scenario_name = os.path.splitext(os.path.basename(self.options.scenario))[0]
-
-            def get_scenario_data(file):
-                for line in file:
-                    val_str, fee_str = line.rstrip().lstrip().split(",")
-                    yield val_str, fee_str
-
-            scenario_files = [open(self.options.scenario, "r")]
-            scenario_data = get_scenario_data(scenario_files[0])
-        elif self.options.payments and self.options.feerates:
-            self.scenario_name = f"{os.path.splitext(os.path.basename(self.options.payments))[0]}_{os.path.splitext(os.path.basename(self.options.feerates))[0]}"
-
-            def cycle(file):
-                while True:
-                    for line in file:
-                        yield line
-                    file.seek(0)
-
-            scenario_files = [
-                open(self.options.payments, "r"),
-                open(self.options.feerates, "r"),
-            ]
-            scenario_data = zip(scenario_files[0], cycle(scenario_files[1]))
-
-        self.scenario_path = self.options.scenario
 
         fields = [
             "Scenario File",
@@ -403,7 +404,7 @@ class CoinSelectionSimulation(Simulation):
             sum_csvw.writerow(fields)
 
             res.write(
-                f"----BEGIN SIMULATION RESULTS----\nScenario: {self.scenario_name}\nBranch: {branch}-{commit_hash}-{label} \n{header}\n"
+                f"----BEGIN SIMULATION RESULTS----\nScenario: {self.scenario_name}\nBranch: {branch}-{commit_hash} \n{header}\n"
             )
             res.flush()
             for val_str, fee_str in scenario_data:

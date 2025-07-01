@@ -163,14 +163,14 @@ class CoinSelectionSimulation(Simulation):
         # No change counts
         no_change_str = ""
         no_change_total = 0
-        for algo, c in self.no_change.items():
+        for algo, c in dict(sorted(self.no_change.items())).items():
             no_change_total += c
             no_change_str += f"{algo}: **{c}** ; "
         no_change_str += f"Total: **{no_change_total}**"
 
         # Usage counts
         usage_str = ""
-        for algo, c in self.algo_counts.items():
+        for algo, c in dict(sorted(self.algo_counts.items())).items():
             usage_str += f"{algo}: **{c}** ; "
         usage_str = usage_str[:-3]
 

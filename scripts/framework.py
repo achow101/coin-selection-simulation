@@ -198,8 +198,6 @@ class Simulation:
     def setup(self):
         if not self.is_usdt_compiled():
             raise Exception("USDT Tracepoints are not compiled, cannot run simulation")
-        if not self.is_sqlite_compiled():
-            raise Exception("SQLite is not compiled, cannot run simulation")
 
         check_json_precision()
 
@@ -209,7 +207,7 @@ class Simulation:
 
         fname_bitcoind = os.path.join(
             config["environment"]["BUILDDIR"],
-            "src",
+            "bin",
             "bitcoind" + config["environment"]["EXEEXT"],
         )
         self.options.bitcoind = os.getenv("BITCOIND", default=fname_bitcoind)
@@ -366,7 +364,3 @@ class Simulation:
     def is_usdt_compiled(self):
         """Checks whether the USDT tracepoints were compiled."""
         return self.config["components"].getboolean("ENABLE_USDT_TRACEPOINTS")
-
-    def is_sqlite_compiled(self):
-        """Checks whether the wallet module was compiled with Sqlite support."""
-        return self.config["components"].getboolean("USE_SQLITE")
